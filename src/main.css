@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Fredoka:wght@300..700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #eaf4f4;
+  --ink: #1e2a2f;
+
+  --green: #6bcb77;
+  --green-dark: #3f9b4d;
+  --orange: #ffb648;
+  --orange-dark: #d68a1f;
+  --blue: #63b3ed;
+  --blue-dark: #2f7ec7;
+  --pink: #ff8fab;
+  --pink-dark: #d85f82;
+  --gray: #e7ebe4;
+  --gray-dark: #b9c2b4;
+
+  --radius: 16px;
+  --border: 3px;
+}
+
+/* ---- Base cartoon button ---- */
+.btn {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--face, var(--green));
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 14px 28px;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 6px 0 var(--side, var(--green-dark));
+  transform: translateY(0);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover {
+  filter: brightness(1.04);
+}
+
+.btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 var(--side, var(--green-dark));
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.btn.orange {
+  --face: var(--orange);
+  --side: var(--orange-dark);
+}
+.btn.blue {
+  --face: var(--blue);
+  --side: var(--blue-dark);
+}
+.btn.pink {
+  --face: var(--pink);
+  --side: var(--pink-dark);
+}
+.btn.ghost {
+  --face: #fff;
+  --side: var(--gray-dark);
+  color: var(--ink);
+}
+
+/* ---- Disabled ---- */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: 0 6px 0 var(--side, var(--green-dark));
+  transform: none;
+  filter: none;
+}
+
+/* ---- Icon-only round button ---- */
+.btn.icon {
+  padding: 14px;
+  border-radius: 999px;
+  aspect-ratio: 1;
+  justify-content: center;
+}
+
+/* ---- Pill toggle ---- */
+.toggle-group {
+  display: inline-flex;
+  background: #fff;
+  border: var(--border) solid var(--ink);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 6px 0 var(--gray-dark);
+}
+
+.toggle-group button {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.toggle-group button.active {
+  background: var(--green);
+  box-shadow: inset 0 -3px 0 var(--green-dark);
+}
+
+/* ---- Bouncy outline button (for hero / floating scene) ---- */
+.btn.bounce:hover {
+  animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+  60% {
+    transform: translateY(0);
+  }
+}
