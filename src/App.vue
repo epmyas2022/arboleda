@@ -278,7 +278,9 @@ onUnmounted(() => {
       <section class="content-section align-left">
         <div class="text">
           <h2 class="subtitle-2"><span class="text-number">03 </span>El<br />Zorro</h2>
-          <p class="text-secondary">Minimalismo puro. Dejá que el arte 3D hable por sí solo.</p>
+          <p class="text-secondary">
+            Astucia salvaje. Silencio, agilidad y elegancia en un solo diseño.
+          </p>
           <div class="action-wrap">
             <span class="btn-minimal">Ver proyectos</span>
           </div>
@@ -288,7 +290,7 @@ onUnmounted(() => {
       <section class="content-section align-right">
         <div class="text">
           <h2 class="subtitle-3"><span class="text-number">04 </span>El<br />Ciervo</h2>
-          <p class="text-secondary">Minimalismo puro. Dejá que el arte 3D hable por sí solo.</p>
+          <p class="text-secondary">Elegancia natural. Serenidad y belleza en movimiento.</p>
           <div class="action-wrap">
             <span class="btn-minimal">Ver proyectos</span>
           </div>
