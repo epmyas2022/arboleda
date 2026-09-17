@@ -1,28 +1,31 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
-import { /* OrbitControls, */ GLTFModel, useGLTF } from /*   TransformControls,
- */ '@tresjs/cientos'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { OrbitControls, GLTFModel } from '@tresjs/cientos'
+import { onMounted, onUnmounted, ref } from 'vue'
 import gsap from 'gsap'
 import ParticlesComponent from './components/ParticlesComponent.vue'
-/* import ControlsModelComponent from './components/ControlsModelComponent.vue'
- */
-
 import { SplitText } from 'gsap/SplitText'
-
+import CharacterComponent from './components/CharacterComponent.vue'
+import ControlsModelComponent from './components/ControlsModelComponent.vue'
 // Configuración de la cámara inicial
 const position = ref([5, -0.2, 7])
 const lookAtTarget = ref([4, -0.2, 2])
 
-const { state } = useGLTF('/fox.glb')
+const modelRef = ref<typeof GLTFModel | null>(null) // Referencia al modelo 3D para los controles de posición
 
-const modelRef = ref<typeof GLTFModel | null>(null)
+const debug = ref(false) // Para activar los controles de la cámara y ver el modelo en detalle
 
-const modelPosition = ref({ x: 0.2, y: -1.65, z: 0.81 })
+const positions = ref({
+  fox: {
+    scale: 0.04,
+    points: { x: 0.2, y: -1.65, z: 0.81 },
+  },
 
-const modelHeight = 0.04
-
-const scene = computed(() => state.value?.scene)
+  deer: {
+    scale: 0.002,
+    points: { x: 0.5, y: -1.57, z: -2.78 },
+  },
+})
 
 let ctx: gsap.Context
 
@@ -53,7 +56,7 @@ onMounted(() => {
       },
     })
 
-    const split = ['.subtitle-1', '.subtitle-2'].reduce(
+    const split = ['.subtitle-1', '.subtitle-2', '.subtitle-3'].reduce(
       (acc, title) => {
         acc[title] = SplitText.create(title, {
           type: 'chars, words, lines',
@@ -94,7 +97,7 @@ onMounted(() => {
             y: 100,
             opacity: 0,
             stagger: 0.05,
-            duration: 1,
+            duration: 0.8,
             ease: 'power3.out',
           },
           '<1.5',
@@ -102,21 +105,21 @@ onMounted(() => {
 
         tl.to(cameraData, {
           x: 1,
-          y: modelPosition.value.y + modelHeight * 2,
+          y: positions.value.fox.points.y + positions.value.fox.scale * 2,
           z: -1,
           lookX: 1,
-          lookY: modelPosition.value.y + modelHeight / 2,
+          lookY: positions.value.fox.points.y + positions.value.fox.scale / 2,
           lookZ: 1,
           ease: 'none',
-          duration: 1.5,
+          duration: 2,
         })
 
         tl.to(cameraData, {
-          x: modelPosition.value.x - 0.02,
-          z: modelPosition.value.z - 0.15,
-          lookZ: 2,
+          x: positions.value.fox.points.x - 0.02,
+          z: positions.value.fox.points.z - (!isMobile ? 0.15 : 0.7),
+          lookZ: !isMobile ? 2 : 6,
           ease: 'none',
-          duration: 1,
+          duration: 2,
         })
 
         tl.from(
@@ -125,7 +128,48 @@ onMounted(() => {
             y: 100,
             opacity: 0,
             stagger: 0.05,
-            duration: 1,
+            duration: 1.5,
+            ease: 'power3.out',
+          },
+          '<1.8',
+        )
+
+        /**
+         *------------------------------------------------
+         *| MOSTRAR DEER CHARACTER
+         --------------------------------------------------
+         *  */
+
+        tl.to(cameraData, {
+          x: positions.value.deer.points.x - 0.01,
+          y: -1,
+          lookX: 7,
+          lookZ: -25,
+          ease: 'none',
+          duration: 2,
+        })
+
+        tl.to(cameraData, {
+          x: positions.value.deer.points.x - 0.02,
+          z: -1,
+          ease: 'none',
+          duration: 1,
+        })
+
+        tl.to(cameraData, {
+          y: positions.value.deer.points.y + positions.value.deer.scale * 2,
+          z: positions.value.deer.points.z + 0.5,
+          ease: 'none',
+          duration: 1,
+        })
+
+        tl.from(
+          split['.subtitle-3']!.chars,
+          {
+            y: 100,
+            opacity: 0,
+            stagger: 0.05,
+            duration: 1.5,
             ease: 'power3.out',
           },
           '<0.8',
@@ -142,7 +186,7 @@ onUnmounted(() => {
 
 <template>
   <main class="scrollable-page">
-    <div class="canvas-bg">
+    <div class="canvas-bg" :style="{ zIndex: debug ? 1 : -1 }">
       <TresCanvas clear-color="#b1e1ff" shadows>
         <!-- Niebla con muchísima más profundidad -->
         <TresFog :args="['#b1e1ff', 3, 10]" />
@@ -153,16 +197,21 @@ onUnmounted(() => {
         <!-- Luciérnagas -->
         <ParticlesComponent :total-fireflies="2000" />
 
-        <template v-if="scene">
-          <!--           <TransformControls :object="modelRef" mode="translate" />
- -->
-          <primitive
-            ref="modelRef"
-            :object="scene"
-            :scale="[0.04, 0.04, 0.04]"
-            :position="[modelPosition.x, modelPosition.y, modelPosition.z]"
-          />
-        </template>
+        <CharacterComponent
+          v-model="modelRef"
+          model-path="/fox.glb"
+          :position="positions.fox.points"
+          :scale="positions.fox.scale"
+          :debug="debug"
+        />
+
+        <CharacterComponent
+          model-path="/deer.glb"
+          v-model="modelRef"
+          :position="positions.deer.points"
+          :scale="positions.deer.scale"
+          :debug="debug"
+        />
 
         <Suspense>
           <GLTFModel
@@ -185,20 +234,30 @@ onUnmounted(() => {
           cast-shadow
         />
 
-        <!--         <OrbitControls make-default />
- -->
+        <!--         <OrbitControls
+          make-default
+          :target="[
+            modelRef?.value?.position.x ?? 0,
+            modelRef?.value?.position.y ?? 0,
+            modelRef?.value?.position.z ?? 0,
+          ]"
+          :min-distance="0.01"
+          :max-distance="50"
+        />  -->
+        -
         <!-- 3. Luz de rebote (Relleno): Azul puro del otro lado para contrastar fuerte -->
         <TresDirectionalLight :position="[-15, 10, -15]" :intensity="1.5" color="#0055ff" />
       </TresCanvas>
     </div>
 
-    <!--     <ControlsModelComponent v-model="modelRef"></ControlsModelComponent>
- -->
+    <ControlsModelComponent v-if="debug" v-model="modelRef"></ControlsModelComponent>
+
+    -
     <!-- Contenedor con múltiples secciones scrolleables -->
     <div class="sections-container">
       <section class="content-section align-left">
         <div class="text hero-text">
-          <h1>Portfolio.</h1>
+          <h1>Arboleda.</h1>
           <p class="text-secondary">Desarrollo interactivo y geometría low poly.</p>
           <div class="action-wrap">
             <span class="btn-minimal">Descubrir</span>
@@ -218,7 +277,17 @@ onUnmounted(() => {
 
       <section class="content-section align-left">
         <div class="text">
-          <h2 class="subtitle-2"><span class="text-number">03 </span>Mis<br />Obras</h2>
+          <h2 class="subtitle-2"><span class="text-number">03 </span>El<br />Zorro</h2>
+          <p class="text-secondary">Minimalismo puro. Dejá que el arte 3D hable por sí solo.</p>
+          <div class="action-wrap">
+            <span class="btn-minimal">Ver proyectos</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section align-right">
+        <div class="text">
+          <h2 class="subtitle-3"><span class="text-number">04 </span>El<br />Ciervo</h2>
           <p class="text-secondary">Minimalismo puro. Dejá que el arte 3D hable por sí solo.</p>
           <div class="action-wrap">
             <span class="btn-minimal">Ver proyectos</span>
@@ -369,14 +438,14 @@ h2 {
   /* Forzamos que todas las secciones se alineen a la izquierda en mobile para mejor lectura */
   .content-section {
     padding: 0 5%;
-    align-items: flex-end;
+    align-items: center;
     padding-bottom: 12vh;
-    justify-content: center !important;
-    text-align: left !important;
+    justify-content: center;
+    text-align: left;
   }
 
   .text {
-    align-items: flex-start !important;
+    align-items: flex-start;
   }
 }
 </style>

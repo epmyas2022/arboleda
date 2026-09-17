@@ -38,5 +38,6 @@ watch(
   border: 1px solid #ccc;
   padding: 10px;
   margin: 10px 0;
+  z-index: 1000;
 }
 </style>
