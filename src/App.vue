@@ -1,19 +1,36 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
-import { /* OrbitControls, */ GLTFModel } from '@tresjs/cientos'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { /* OrbitControls, */ GLTFModel, useGLTF } from /*   TransformControls,
+ */ '@tresjs/cientos'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import gsap from 'gsap'
 import ParticlesComponent from './components/ParticlesComponent.vue'
+/* import ControlsModelComponent from './components/ControlsModelComponent.vue'
+ */
+
+import { SplitText } from 'gsap/SplitText'
 
 // Configuración de la cámara inicial
 const position = ref([5, -0.2, 7])
 const lookAtTarget = ref([4, -0.2, 2])
+
+const { state } = useGLTF('/fox.glb')
+
+const modelRef = ref<typeof GLTFModel | null>(null)
+
+const modelPosition = ref({ x: 0.2, y: -1.65, z: 0.81 })
+
+const modelHeight = 0.04
+
+const scene = computed(() => state.value?.scene)
 
 let ctx: gsap.Context
 
 onMounted(() => {
   // GSAP Context asegura que podamos limpiar todo al desmontar el componente
   ctx = gsap.context(() => {
+    const mm = gsap.matchMedia()
+
     const cameraData = {
       x: 5,
       y: -0.2,
@@ -36,33 +53,85 @@ onMounted(() => {
       },
     })
 
-    // Paso 1: Avanzamos recto hasta la mitad del bosque (Llegada a "El Bosque")
-    tl.to(cameraData, {
-      x: 0,
-      z: 3,
-      lookX: -1,
-      lookZ: -7,
-      ease: 'none',
-    })
+    const split = ['.subtitle-1', '.subtitle-2'].reduce(
+      (acc, title) => {
+        acc[title] = SplitText.create(title, {
+          type: 'chars, words, lines',
+        })
+        return acc
+      },
+      {} as Record<string, SplitText>,
+    )
 
-    // Paso 2: Frenamos el avance y ROTAMOS la cámara hacia la derecha para admirar el paisaje
-    tl.to(cameraData, {
-      x: 0,
-      z: -3,
-      lookX: 10,
-      lookZ: -7,
-      ease: 'power2.inOut',
-      duration: 0.5, // Hace que este paso dure la mitad de un tramo normal
-    })
+    mm.add(
+      {
+        isDesktop: '(min-width: 1024px)',
+        isTablet: '(min-width: 768px) and (max-width: 1023px)',
+        isMobile: '(max-width: 767px)',
+      },
+      function (context) {
+        const { isMobile } = context.conditions as {
+          isDesktop: boolean
+          isTablet: boolean
+          isMobile: boolean
+        }
 
-    // Paso 3: Retomamos la vista al frente y caminamos hasta el final (Llegada a "Mis Obras")
-    tl.to(cameraData, {
-      x: 0,
-      z: -4,
-      lookX: 15,
-      lookZ: -7,
-      ease: 'none',
-    })
+        console.log('isMobile:', isMobile)
+
+        // Paso 1: Avanzamos recto hasta la mitad del bosque (Llegada a "El Bosque")
+        tl.to(cameraData, {
+          x: 0,
+          z: 3,
+          lookX: -7,
+          lookZ: -7,
+          duration: 3,
+          ease: 'none',
+        })
+
+        tl.from(
+          split['.subtitle-1']!.chars,
+          {
+            y: 100,
+            opacity: 0,
+            stagger: 0.05,
+            duration: 1,
+            ease: 'power3.out',
+          },
+          '<1.5',
+        )
+
+        tl.to(cameraData, {
+          x: 1,
+          y: modelPosition.value.y + modelHeight * 2,
+          z: -1,
+          lookX: 1,
+          lookY: modelPosition.value.y + modelHeight / 2,
+          lookZ: 1,
+          ease: 'none',
+          duration: 1.5,
+        })
+
+        tl.to(cameraData, {
+          x: modelPosition.value.x - 0.02,
+          z: modelPosition.value.z - 0.15,
+          lookZ: 2,
+          ease: 'none',
+          duration: 1,
+        })
+
+        tl.from(
+          split['.subtitle-2']!.chars,
+          {
+            y: 100,
+            opacity: 0,
+            stagger: 0.05,
+            duration: 1,
+            ease: 'power3.out',
+          },
+          '<0.8',
+        )
+      },
+    )
   })
 })
 
@@ -83,6 +152,17 @@ onUnmounted(() => {
 
         <!-- Luciérnagas -->
         <ParticlesComponent :total-fireflies="2000" />
+
+        <template v-if="scene">
+          <!--           <TransformControls :object="modelRef" mode="translate" />
+ -->
+          <primitive
+            ref="modelRef"
+            :object="scene"
+            :scale="[0.04, 0.04, 0.04]"
+            :position="[modelPosition.x, modelPosition.y, modelPosition.z]"
+          />
+        </template>
 
         <Suspense>
           <GLTFModel
@@ -105,11 +185,15 @@ onUnmounted(() => {
           cast-shadow
         />
 
+        <!--         <OrbitControls make-default />
+ -->
         <!-- 3. Luz de rebote (Relleno): Azul puro del otro lado para contrastar fuerte -->
         <TresDirectionalLight :position="[-15, 10, -15]" :intensity="1.5" color="#0055ff" />
       </TresCanvas>
     </div>
 
+    <!--     <ControlsModelComponent v-model="modelRef"></ControlsModelComponent>
+ -->
     <!-- Contenedor con múltiples secciones scrolleables -->
     <div class="sections-container">
       <section class="content-section align-left">
@@ -124,7 +208,7 @@ onUnmounted(() => {
 
       <section class="content-section align-right">
         <div class="text">
-          <h2>El<br />Bosque</h2>
+          <h2 class="subtitle-1"><span class="text-number">02 </span>El<br />Bosque</h2>
           <p class="text-secondary">
             Una experiencia inmersiva guiada por el scroll. Sin cajas, sin distracciones. Solo el
             contenido y el modelo.
@@ -134,7 +218,7 @@ onUnmounted(() => {
 
       <section class="content-section align-left">
         <div class="text">
-          <h2>Mis<br />Obras</h2>
+          <h2 class="subtitle-2"><span class="text-number">03 </span>Mis<br />Obras</h2>
           <p class="text-secondary">Minimalismo puro. Dejá que el arte 3D hable por sí solo.</p>
           <div class="action-wrap">
             <span class="btn-minimal">Ver proyectos</span>
@@ -256,6 +340,14 @@ h2 {
   padding-bottom: 4px;
 }
 
+.text-number {
+  font-size: 6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  color: #ff7a00;
+}
+
 /* --- RESPONSIVE MOBILE --- */
 @media (max-width: 768px) {
   /* Achicamos drásticamente la tipografía para que no desborde la pantalla */
@@ -277,7 +369,8 @@ h2 {
   /* Forzamos que todas las secciones se alineen a la izquierda en mobile para mejor lectura */
   .content-section {
     padding: 0 5%;
-    align-items: flex-start;
+    align-items: flex-end;
+    padding-bottom: 12vh;
     justify-content: center !important;
     text-align: left !important;
   }
