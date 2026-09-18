@@ -146,7 +146,9 @@ export function useAnimations(
             ease: 'power1.out',
             duration: 3,
           })
-          tl.to(cameraData, { x: '+=0.02', lookX: '+=0.02', duration: 4, ease: 'none' })
+          if (!isMobile) {
+            tl.to(cameraData, { x: '+=0.02', lookX: '+=0.02', duration: 4, ease: 'none' })
+          }
 
           // ==========================================
           // 5. CONEJO
@@ -185,8 +187,10 @@ export function useAnimations(
             ease: 'power1.out',
             duration: 3,
           })
-          tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
 
+          if (!isMobile) {
+            tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
+          }
           // ==========================================
           // Animaciones independientes para los subtítulos
           // ==========================================
