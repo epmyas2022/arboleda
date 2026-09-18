@@ -3,10 +3,23 @@ import { TresCanvas } from '@tresjs/core'
 import { OrbitControls, GLTFModel } from '@tresjs/cientos'
 import { onMounted, onUnmounted, ref } from 'vue'
 import gsap from 'gsap'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ParticlesComponent from './components/ParticlesComponent.vue'
 import { SplitText } from 'gsap/SplitText'
 import CharacterComponent from './components/CharacterComponent.vue'
 import ControlsModelComponent from './components/ControlsModelComponent.vue'
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
+
+const scrollToSection = (target: string) => {
+  gsap.to(window, {
+    duration: 3,
+    scrollTo: target,
+    ease: 'power2.inOut',
+  })
+}
+
 // Configuración de la cámara inicial
 const position = ref([5, -0.2, 7])
 const lookAtTarget = ref([4, -0.2, 2])
@@ -24,6 +37,21 @@ const positions = ref({
   deer: {
     scale: 0.002,
     points: { x: 0.5, y: -1.57, z: -2.78 },
+  },
+
+  elephant: {
+    scale: 0.04,
+    points: { x: -2.33, y: -1.68, z: -0.12 },
+  },
+
+  rabbit: {
+    scale: 0.17,
+    points: { x: 1.76, y: -1.65, z: 1.18 },
+  },
+
+  rhinoceros: {
+    scale: 0.002,
+    points: { x: -3.51, y: -1.55, z: -3.04 },
   },
 })
 
@@ -56,7 +84,14 @@ onMounted(() => {
       },
     })
 
-    const split = ['.subtitle-1', '.subtitle-2', '.subtitle-3'].reduce(
+    const split = [
+      '.subtitle-1',
+      '.subtitle-2',
+      '.subtitle-3',
+      '.subtitle-4',
+      '.subtitle-5',
+      '.subtitle-6',
+    ].reduce(
       (acc, title) => {
         acc[title] = SplitText.create(title, {
           type: 'chars, words, lines',
@@ -81,99 +116,180 @@ onMounted(() => {
 
         console.log('isMobile:', isMobile)
 
-        // Paso 1: Avanzamos recto hasta la mitad del bosque (Llegada a "El Bosque")
+        // ==========================================
+        // 1. BOSQUE
+        // ==========================================
         tl.to(cameraData, {
           x: 0,
           z: 3,
           lookX: -7,
           lookZ: -7,
-          duration: 3,
-          ease: 'none',
+          ease: 'power1.inOut',
+          duration: 6,
         })
-
         tl.from(
           split['.subtitle-1']!.chars,
           {
-            y: 100,
+            y: 50,
             opacity: 0,
-            stagger: 0.05,
-            duration: 0.8,
+            stagger: 0.02,
+            duration: 2,
             ease: 'power3.out',
           },
-          '<1.5',
+          '<4',
         )
+        tl.to(cameraData, { x: '+=0', duration: 4 })
 
-        tl.to(cameraData, {
-          x: 1,
-          y: positions.value.fox.points.y + positions.value.fox.scale * 2,
-          z: -1,
-          lookX: 1,
-          lookY: positions.value.fox.points.y + positions.value.fox.scale / 2,
-          lookZ: 1,
-          ease: 'none',
-          duration: 2,
-        })
-
+        // ==========================================
+        // 2. ZORRO
+        // ==========================================
         tl.to(cameraData, {
           x: positions.value.fox.points.x - 0.02,
-          z: positions.value.fox.points.z - (!isMobile ? 0.15 : 0.7),
-          lookZ: !isMobile ? 2 : 6,
-          ease: 'none',
-          duration: 2,
+          y: positions.value.fox.points.y + 0.1,
+          z: positions.value.fox.points.z - (!isMobile ? 0.3 : 0.8),
+          lookX: positions.value.fox.points.x,
+          lookY: positions.value.fox.points.y + positions.value.fox.scale / 2,
+          lookZ: positions.value.fox.points.z,
+          ease: 'power1.inOut',
+          duration: 6,
         })
-
         tl.from(
           split['.subtitle-2']!.chars,
           {
-            y: 100,
+            y: 50,
             opacity: 0,
-            stagger: 0.05,
-            duration: 1.5,
+            stagger: 0.02,
+            duration: 2,
             ease: 'power3.out',
           },
-          '<1.8',
+          '<4',
         )
+        tl.to(cameraData, { x: '+=0.02', z: '+=0.02', duration: 4, ease: 'none' })
 
-        /**
-         *------------------------------------------------
-         *| MOSTRAR DEER CHARACTER
-         --------------------------------------------------
-         *  */
-
+        // ==========================================
+        // 3. CIERVO
+        // ==========================================
         tl.to(cameraData, {
-          x: positions.value.deer.points.x - 0.01,
-          y: -1,
-          lookX: 7,
-          lookZ: -25,
-          ease: 'none',
-          duration: 2,
+          x: positions.value.deer.points.x - 0.5,
+          y: positions.value.deer.points.y + 0.1,
+          z: positions.value.deer.points.z + 1.5,
+          lookX: positions.value.deer.points.x,
+          lookY: positions.value.deer.points.y,
+          lookZ: positions.value.deer.points.z,
+          ease: 'power1.inOut',
+          duration: 3,
         })
-
         tl.to(cameraData, {
-          x: positions.value.deer.points.x - 0.02,
-          z: -1,
-          ease: 'none',
-          duration: 1,
-        })
-
-        tl.to(cameraData, {
-          y: positions.value.deer.points.y + positions.value.deer.scale * 2,
+          x: positions.value.deer.points.x - 0.1,
+          y: positions.value.deer.points.y + 0.05,
           z: positions.value.deer.points.z + 0.5,
-          ease: 'none',
-          duration: 1,
+          ease: 'power1.out',
+          duration: 3,
         })
-
         tl.from(
           split['.subtitle-3']!.chars,
           {
-            y: 100,
+            y: 50,
             opacity: 0,
-            stagger: 0.05,
-            duration: 1.5,
+            stagger: 0.02,
+            duration: 2,
             ease: 'power3.out',
           },
-          '<0.8',
+          '<1',
         )
+        tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
+
+        // ==========================================
+        // 4. ELEFANTE
+        // ==========================================
+        tl.to(cameraData, {
+          x: positions.value.elephant.points.x - 0.5,
+          y: -0.5,
+          lookX: positions.value.elephant.points.x,
+          lookZ: positions.value.elephant.points.z,
+          ease: 'power1.inOut',
+          duration: 3,
+        })
+        tl.to(cameraData, {
+          x: positions.value.elephant.points.x + 0.3,
+          y: positions.value.elephant.points.y + 0.4,
+          z: positions.value.elephant.points.z + 0.5,
+          ease: 'power1.out',
+          duration: 3,
+        })
+        tl.from(
+          split['.subtitle-4']!.chars,
+          {
+            y: 50,
+            opacity: 0,
+            stagger: 0.02,
+            duration: 2,
+            ease: 'power3.out',
+          },
+          '<1',
+        )
+        tl.to(cameraData, { x: '+=0.02', lookX: '+=0.02', duration: 4, ease: 'none' })
+
+        // ==========================================
+        // 5. CONEJO
+        // ==========================================
+        tl.to(cameraData, {
+          x: positions.value.rabbit.points.x + 0.7,
+          y: 1,
+          lookX: positions.value.rabbit.points.x - 10,
+          lookZ: positions.value.rabbit.points.z - 0.5,
+          ease: 'power1.inOut',
+          duration: 3,
+        })
+        tl.to(cameraData, {
+          y: positions.value.rabbit.points.y + 0.1,
+          z: positions.value.rabbit.points.z + 0.1,
+          ease: 'power1.out',
+          duration: 3,
+        })
+        tl.from(
+          split['.subtitle-5']!.chars,
+          {
+            y: 50,
+            opacity: 0,
+            stagger: 0.02,
+            duration: 2,
+            ease: 'power3.out',
+          },
+          '<1',
+        )
+        tl.to(cameraData, { x: '-=0.02', lookZ: '-=0.02', duration: 4, ease: 'none' })
+
+        // ==========================================
+        // 6. RINOCERONTE
+        // ==========================================
+        tl.to(cameraData, {
+          x: positions.value.rhinoceros.points.x + 0.3,
+          y: 1,
+          z: 10,
+          lookX: positions.value.rhinoceros.points.x - 1,
+          lookZ: positions.value.rhinoceros.points.z - 0.6,
+          ease: 'power1.inOut',
+          duration: 3,
+        })
+        tl.to(cameraData, {
+          y: positions.value.rhinoceros.points.y + 0.1,
+          z: positions.value.rhinoceros.points.z + 0.5,
+          ease: 'power1.out',
+          duration: 3,
+        })
+        tl.from(
+          split['.subtitle-6']!.chars,
+          {
+            y: 50,
+            opacity: 0,
+            stagger: 0.02,
+            duration: 2,
+            ease: 'power3.out',
+          },
+          '<1',
+        )
+        tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
       },
     )
   })
@@ -213,6 +329,30 @@ onUnmounted(() => {
           :debug="debug"
         />
 
+        <CharacterComponent
+          model-path="/elephant.glb"
+          v-model="modelRef"
+          :position="positions.elephant.points"
+          :scale="positions.elephant.scale"
+          :debug="debug"
+        />
+
+        <CharacterComponent
+          model-path="/rabbit.glb"
+          v-model="modelRef"
+          :position="positions.rabbit.points"
+          :scale="positions.rabbit.scale"
+          :debug="debug"
+        />
+
+        <CharacterComponent
+          model-path="/rhinoceros.glb"
+          v-model="modelRef"
+          :position="positions.rhinoceros.points"
+          :scale="positions.rhinoceros.scale"
+          :debug="debug"
+        />
+
         <Suspense>
           <GLTFModel
             path="/forest.glb"
@@ -234,7 +374,8 @@ onUnmounted(() => {
           cast-shadow
         />
 
-        <!--         <OrbitControls
+        <OrbitControls
+          v-if="false"
           make-default
           :target="[
             modelRef?.value?.position.x ?? 0,
@@ -243,8 +384,8 @@ onUnmounted(() => {
           ]"
           :min-distance="0.01"
           :max-distance="50"
-        />  -->
-        -
+        />
+        - -
         <!-- 3. Luz de rebote (Relleno): Azul puro del otro lado para contrastar fuerte -->
         <TresDirectionalLight :position="[-15, 10, -15]" :intensity="1.5" color="#0055ff" />
       </TresCanvas>
@@ -255,44 +396,77 @@ onUnmounted(() => {
     -
     <!-- Contenedor con múltiples secciones scrolleables -->
     <div class="sections-container">
-      <section class="content-section align-left">
+      <section class="content-section align-left" id="arboleda">
         <div class="text hero-text">
           <h1>Arboleda.</h1>
           <p class="text-secondary">Desarrollo interactivo y geometría low poly.</p>
           <div class="action-wrap">
-            <span class="btn-minimal">Descubrir</span>
+            <a href="#el-bosque" @click.prevent="scrollToSection('#el-bosque')" class="btn-minimal">Descubrir</a>
           </div>
         </div>
       </section>
 
-      <section class="content-section align-right">
+      <section class="content-section align-right" id="el-bosque">
         <div class="text">
           <h2 class="subtitle-1"><span class="text-number">02 </span>El<br />Bosque</h2>
           <p class="text-secondary">
             Una experiencia inmersiva guiada por el scroll. Sin cajas, sin distracciones. Solo el
             contenido y el modelo.
           </p>
+          <div class="action-wrap">
+            <a href="#el-zorro" @click.prevent="scrollToSection('#el-zorro')" class="btn-minimal">Conocer mas</a>
+          </div>
         </div>
       </section>
 
-      <section class="content-section align-left">
+      <section class="content-section align-left" id="el-zorro">
         <div class="text">
           <h2 class="subtitle-2"><span class="text-number">03 </span>El<br />Zorro</h2>
           <p class="text-secondary">
             Astucia salvaje. Silencio, agilidad y elegancia en un solo diseño.
           </p>
           <div class="action-wrap">
-            <span class="btn-minimal">Ver proyectos</span>
+            <a href="#el-ciervo" @click.prevent="scrollToSection('#el-ciervo')" class="btn-minimal">Conocer mas</a>
           </div>
         </div>
       </section>
 
-      <section class="content-section align-right">
+      <section class="content-section align-right" id="el-ciervo">
         <div class="text">
           <h2 class="subtitle-3"><span class="text-number">04 </span>El<br />Ciervo</h2>
           <p class="text-secondary">Elegancia natural. Serenidad y belleza en movimiento.</p>
           <div class="action-wrap">
-            <span class="btn-minimal">Ver proyectos</span>
+            <a href="#el-elefante" @click.prevent="scrollToSection('#el-elefante')" class="btn-minimal">Conocer mas</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section align-left" id="el-elefante">
+        <div class="text">
+          <h2 class="subtitle-4"><span class="text-number">05 </span>El<br />Elefante</h2>
+          <p class="text-secondary">Fuerza y sabiduría. Imponente presencia en el bosque.</p>
+          <div class="action-wrap">
+            <a href="#el-conejo" @click.prevent="scrollToSection('#el-conejo')" class="btn-minimal">Conocer mas</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section align-left" id="el-conejo">
+        <div class="text">
+          <h2 class="subtitle-5"><span class="text-number">06 </span>El<br />Conejo</h2>
+          <p class="text-secondary">Rapidez y destreza. Movimientos ágiles entre la maleza.</p>
+          <div class="action-wrap">
+            <a href="#el-rino" @click.prevent="scrollToSection('#el-rino')" class="btn-minimal">Conocer mas</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section align-right" id="el-rino">
+        <div class="text">
+          <h2 class="subtitle-6"><span class="text-number">07 </span>El<br />Rino</h2>
+          <p class="text-secondary">Poder absoluto. Una armadura natural e inquebrantable.</p>
+          <div class="action-wrap">
+            <a href="#arboleda" @click.prevent="scrollToSection('#arboleda')" class="btn-minimal">Volver al inicio</a>
           </div>
         </div>
       </section>
@@ -400,6 +574,8 @@ h2 {
   padding-bottom: 8px;
   border-bottom: 3px solid #ffffff;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
   transition:
     opacity 0.3s ease,
     padding-bottom 0.3s ease;
