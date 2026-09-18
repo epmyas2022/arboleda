@@ -14,9 +14,9 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
 const scrollToSection = (target: string) => {
   gsap.to(window, {
-    duration: 3,
+    duration: 4.5,
     scrollTo: target,
-    ease: 'power2.inOut',
+    ease: 'power3.inOut',
   })
 }
 
@@ -127,17 +127,6 @@ onMounted(() => {
           ease: 'power1.inOut',
           duration: 6,
         })
-        tl.from(
-          split['.subtitle-1']!.chars,
-          {
-            y: 50,
-            opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<4',
-        )
         tl.to(cameraData, { x: '+=0', duration: 4 })
 
         // ==========================================
@@ -153,17 +142,6 @@ onMounted(() => {
           ease: 'power1.inOut',
           duration: 6,
         })
-        tl.from(
-          split['.subtitle-2']!.chars,
-          {
-            y: 50,
-            opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<4',
-        )
         tl.to(cameraData, { x: '+=0.02', z: '+=0.02', duration: 4, ease: 'none' })
 
         // ==========================================
@@ -186,17 +164,6 @@ onMounted(() => {
           ease: 'power1.out',
           duration: 3,
         })
-        tl.from(
-          split['.subtitle-3']!.chars,
-          {
-            y: 50,
-            opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<1',
-        )
         tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
 
         // ==========================================
@@ -217,17 +184,6 @@ onMounted(() => {
           ease: 'power1.out',
           duration: 3,
         })
-        tl.from(
-          split['.subtitle-4']!.chars,
-          {
-            y: 50,
-            opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<1',
-        )
         tl.to(cameraData, { x: '+=0.02', lookX: '+=0.02', duration: 4, ease: 'none' })
 
         // ==========================================
@@ -247,17 +203,6 @@ onMounted(() => {
           ease: 'power1.out',
           duration: 3,
         })
-        tl.from(
-          split['.subtitle-5']!.chars,
-          {
-            y: 50,
-            opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<1',
-        )
         tl.to(cameraData, { x: '-=0.02', lookZ: '-=0.02', duration: 4, ease: 'none' })
 
         // ==========================================
@@ -278,18 +223,34 @@ onMounted(() => {
           ease: 'power1.out',
           duration: 3,
         })
-        tl.from(
-          split['.subtitle-6']!.chars,
-          {
+        tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
+
+        // ==========================================
+        // Animaciones independientes para los subtítulos
+        // ==========================================
+        const subtitleClasses = [
+          '.subtitle-1',
+          '.subtitle-2',
+          '.subtitle-3',
+          '.subtitle-4',
+          '.subtitle-5',
+          '.subtitle-6',
+        ]
+
+        subtitleClasses.forEach((subClass) => {
+          gsap.from(split[subClass]!.chars, {
+            scrollTrigger: {
+              trigger: subClass,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
             y: 50,
             opacity: 0,
-            stagger: 0.02,
-            duration: 2,
-            ease: 'power3.out',
-          },
-          '<1',
-        )
-        tl.to(cameraData, { x: '+=0.02', z: '-=0.02', duration: 4, ease: 'none' })
+            stagger: 0.05,
+            duration: 1,
+            ease: 'back.out(1.7)',
+          })
+        })
       },
     )
   })
@@ -401,72 +362,89 @@ onUnmounted(() => {
           <h1>Arboleda.</h1>
           <p class="text-secondary">Desarrollo interactivo y geometría low poly.</p>
           <div class="action-wrap">
-            <a href="#el-bosque" @click.prevent="scrollToSection('#el-bosque')" class="btn-minimal">Descubrir</a>
+            <a href="#el-bosque" @click.prevent="scrollToSection('#el-bosque')" class="btn-minimal"
+              >Descubrir</a
+            >
           </div>
         </div>
       </section>
 
       <section class="content-section align-right" id="el-bosque">
         <div class="text">
-          <h2 class="subtitle-1"><span class="text-number">02 </span>El<br />Bosque</h2>
+          <h2 class="subtitle-1"><span class="text-number">01 </span>El<br />Bosque</h2>
           <p class="text-secondary">
             Una experiencia inmersiva guiada por el scroll. Sin cajas, sin distracciones. Solo el
             contenido y el modelo.
           </p>
           <div class="action-wrap">
-            <a href="#el-zorro" @click.prevent="scrollToSection('#el-zorro')" class="btn-minimal">Conocer mas</a>
+            <a href="#el-zorro" @click.prevent="scrollToSection('#el-zorro')" class="btn-minimal"
+              >Conocer mas</a
+            >
           </div>
         </div>
       </section>
 
       <section class="content-section align-left" id="el-zorro">
         <div class="text">
-          <h2 class="subtitle-2"><span class="text-number">03 </span>El<br />Zorro</h2>
+          <h2 class="subtitle-2"><span class="text-number">02 </span>El<br />Zorro</h2>
           <p class="text-secondary">
             Astucia salvaje. Silencio, agilidad y elegancia en un solo diseño.
           </p>
           <div class="action-wrap">
-            <a href="#el-ciervo" @click.prevent="scrollToSection('#el-ciervo')" class="btn-minimal">Conocer mas</a>
+            <a href="#el-ciervo" @click.prevent="scrollToSection('#el-ciervo')" class="btn-minimal"
+              >Conocer mas</a
+            >
           </div>
         </div>
       </section>
 
       <section class="content-section align-right" id="el-ciervo">
         <div class="text">
-          <h2 class="subtitle-3"><span class="text-number">04 </span>El<br />Ciervo</h2>
+          <h2 class="subtitle-3"><span class="text-number">03 </span>El<br />Ciervo</h2>
           <p class="text-secondary">Elegancia natural. Serenidad y belleza en movimiento.</p>
           <div class="action-wrap">
-            <a href="#el-elefante" @click.prevent="scrollToSection('#el-elefante')" class="btn-minimal">Conocer mas</a>
+            <a
+              href="#el-elefante"
+              @click.prevent="scrollToSection('#el-elefante')"
+              class="btn-minimal"
+              >Conocer mas</a
+            >
           </div>
         </div>
       </section>
 
       <section class="content-section align-left" id="el-elefante">
         <div class="text">
-          <h2 class="subtitle-4"><span class="text-number">05 </span>El<br />Elefante</h2>
+          <h2 class="subtitle-4"><span class="text-number">04 </span>El<br />Elefante</h2>
           <p class="text-secondary">Fuerza y sabiduría. Imponente presencia en el bosque.</p>
           <div class="action-wrap">
-            <a href="#el-conejo" @click.prevent="scrollToSection('#el-conejo')" class="btn-minimal">Conocer mas</a>
+            <a href="#el-conejo" @click.prevent="scrollToSection('#el-conejo')" class="btn-minimal"
+              >Conocer mas</a
+            >
           </div>
         </div>
       </section>
 
       <section class="content-section align-left" id="el-conejo">
         <div class="text">
-          <h2 class="subtitle-5"><span class="text-number">06 </span>El<br />Conejo</h2>
+          <h2 class="subtitle-5"><span class="text-number">05 </span>El<br />Conejo</h2>
           <p class="text-secondary">Rapidez y destreza. Movimientos ágiles entre la maleza.</p>
           <div class="action-wrap">
-            <a href="#el-rino" @click.prevent="scrollToSection('#el-rino')" class="btn-minimal">Conocer mas</a>
+            <a href="#el-rino" @click.prevent="scrollToSection('#el-rino')" class="btn-minimal"
+              >Conocer mas</a
+            >
           </div>
         </div>
       </section>
 
-      <section class="content-section align-right" id="el-rino">
+      <section class="content-section align-left" id="el-rino">
         <div class="text">
-          <h2 class="subtitle-6"><span class="text-number">07 </span>El<br />Rino</h2>
+          <h2 class="subtitle-6"><span class="text-number">06 </span>El<br />Rino</h2>
           <p class="text-secondary">Poder absoluto. Una armadura natural e inquebrantable.</p>
           <div class="action-wrap">
-            <a href="#arboleda" @click.prevent="scrollToSection('#arboleda')" class="btn-minimal">Volver al inicio</a>
+            <a href="#arboleda" @click.prevent="scrollToSection('#arboleda')" class="btn-minimal"
+              >Volver al inicio</a
+            >
           </div>
         </div>
       </section>
