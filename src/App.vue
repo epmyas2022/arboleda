@@ -214,7 +214,7 @@ const { scrollToSection } = useAnimations(position, lookAtTarget, positions)
   top: 0;
   left: 0;
   width: 100%;
-  height: 100svh;
+  height: 100dvh;
   z-index: -1;
 }
 
@@ -226,7 +226,7 @@ const { scrollToSection } = useAnimations(position, lookAtTarget, positions)
 }
 
 .content-section {
-  height: 100svh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   padding: 0 8%;
